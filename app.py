@@ -3,6 +3,7 @@ import pickle
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from joblib import load
 
 from sklearn.metrics import confusion_matrix,roc_auc_score,roc_curve,classification_report,roc_curve,auc
 from sklearn.metrics import accuracy_score,precision_score, recall_score, f1_score,roc_auc_score
@@ -34,8 +35,8 @@ if upload_file is not None:
     #st.write(df)
 
 # loading the trained model
-    pickle_in = open('classifier.pkl', 'rb') 
-    classifier = pickle.load(pickle_in)
+    #pickle_in = open('classifier.pkl', 'rb') 
+    classifier = load('model.pkl')
     
     X_test=df[df.columns[1:202]]
     y_test=df['target']
