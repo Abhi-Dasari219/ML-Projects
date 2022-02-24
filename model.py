@@ -49,7 +49,7 @@ def main():
     y_train=df_balanced['target']
 
     # Train and Predict the values using LGBM Classifier
-    model = lgb.LGBMClassifier(num_rounds=600,random_state=42,n_jobs=4,boosting_type='gbdt',objective='binary')
+    model = lgb.LGBMClassifier(num_rounds=500,random_state=42,n_jobs=4,boosting_type='gbdt',objective='binary')
 
     # fit the LGBM model
     model.fit(X_train,y_train,verbose=0,eval_metric='logloss')

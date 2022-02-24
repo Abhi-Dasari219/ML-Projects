@@ -4,20 +4,28 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from joblib import load
+from sklearn import metrics
+import seaborn as sns
+
 
 from sklearn.metrics import confusion_matrix,roc_auc_score,roc_curve,classification_report,roc_curve,auc
 from sklearn.metrics import accuracy_score,precision_score, recall_score, f1_score,roc_auc_score
 
+def udf_performance_metrics(actual,predicted):
+    
+    st.markdown(f'<h1 style="text-decoration: underline;color:Black;font-size:15px;">{"Performance Metrics"}</h1>', unsafe_allow_html=True)
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Accuracy Score", round(accuracy_score(actual,predicted),2))
+    col2.metric("Precision Score", round(precision_score(actual,predicted),2))
+    col3.metric("Recall Score", round(recall_score(actual,predicted),2))
+    col4.metric("F1 Score",round(f1_score(actual,predicted),2))
+    
 def udf_roc_auc_curve_diagram(actual,predicted):
-    #print('Confusion Metrix:')
-    #print(confusion_matrix(actual,predicted))
-
-    #print('Accuracy Score: {0:.2f} ,Precision: {1:.2f}, Recall: {2:.2f} , F1 Score: {3:.2f} '.format(accuracy_score(actual,predicted),precision_score(actual,predicted),recall_score(actual,predicted),f1_score(actual,predicted)))
-    st.write('Accuracy Score:', accuracy_score(actual,predicted))
     fpr, recall, thresholds = roc_curve(actual,predicted)
     roc_auc = auc(fpr, recall)
-
-
+    
+    
+    st.markdown(f'<h1 style="text-decoration: underline;color:Black;font-size:15px;">{"ROC AUC Curve"}</h1>', unsafe_allow_html=True)
     fig = plt.figure()
     ax = fig.add_subplot(111)
     plt.plot(fpr, recall)
@@ -26,26 +34,57 @@ def udf_roc_auc_curve_diagram(actual,predicted):
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
     st.pyplot(plt)
-    
-upload_file=st.file_uploader("Select a file:")
 
-if upload_file is not None:
+def udf_confusion_metrix(actual,predicted):
     
-    df=pd.read_csv(upload_file)
-    #st.write(df)
+    cf_matrix = confusion_matrix(actual,predicted)
+    
+    plt.figure()
+    ax = sns.heatmap(cf_matrix, annot=True, cmap='Blues',fmt ='.0f')
+    st.markdown(f'<h1 style="text-decoration: underline;color:Black;font-size:15px;">{"Confusion Matrix"}</h1>', unsafe_allow_html=True)
+    ax.set_title('Confusion Matrix\n\n');
+    ax.set_xlabel('\nPredicted Values')
+    ax.set_ylabel('Actual Values ');
 
-# loading the trained model
-    #pickle_in = open('classifier.pkl', 'rb') 
-    classifier = load('model.pkl')
+## Ticket labels - List must be in alphabetical order
+    ax.xaxis.set_ticklabels(['False','True'])
+    ax.yaxis.set_ticklabels(['False','True'])
+
+## Display the visualization of the Confusion Matrix.
+    st.pyplot(plt)
+
+
+def main():
+    st.markdown(f'<div style="background-color:#FFFAFA;padding:30px"><h1 style="color:red;font-size:30px;">{"Santandar Customer Transaction Prediction"}</h1></div>', unsafe_allow_html=True)
+    #st.title("Santandar Customer Transaction Prediction")
+    st.markdown(f'<h1 style="color:Black;font-size:15px;">{"     Choose a File to Predict"}</h1>', unsafe_allow_html=True)
+    upload_file=st.file_uploader(' ')
+
+    if upload_file is not None:
     
-    X_test=df[df.columns[1:202]]
-    y_test=df['target']
+        df=pd.read_csv(upload_file)
     
-    y_pred=classifier.predict(X_test)
+
+    # loading the trained model
+        classifier = load('model.pkl')
+        X_test=df[df.columns[1:202]]
+        y_test=df['target']
     
+        y_pred=classifier.predict(X_test)
     
-    udf_roc_auc_curve_diagram(y_test,y_pred)
-    st.write(X_test.head())
-    st.write(y_test.head())
+    if st.checkbox("Performance Metrics"):
+
+        udf_performance_metrics(y_test,y_pred)
+                                  
+    if st.checkbox("ROC AUC Curve"):
+
+        udf_roc_auc_curve_diagram(y_test,y_pred)
+        
+    if st.checkbox("Confusion Matrix"):
+        udf_confusion_metrix(y_test,y_pred)
+        
+if __name__ == '__main__':
+    main()
+
     
   
