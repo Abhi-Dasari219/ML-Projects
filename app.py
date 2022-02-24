@@ -40,7 +40,7 @@ def udf_confusion_metrix(actual,predicted):
     cf_matrix = confusion_matrix(actual,predicted)
     
     plt.figure()
-    ax = sns.heatmap(cf_matrix, annot=True, cmap='Blues',fmt ='.0f')
+    ax = sns.heatmap(cf_matrix, annot=True, cmap='Reds',fmt ='.0f')
     st.markdown(f'<h1 style="text-decoration: underline;color:Black;font-size:15px;">{"Confusion Matrix"}</h1>', unsafe_allow_html=True)
     ax.set_title('Confusion Matrix\n\n');
     ax.set_xlabel('\nPredicted Values')
